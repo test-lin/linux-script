@@ -1,0 +1,33 @@
+# adduser git
+# su git
+$ cd
+$ ssh-keygen -t rsa
+$ wget https://dl.gogs.io/0.11.29/linux_amd64.tar.gz
+$ tar zxvf linux_amd64.tar.gz
+$ cd gogs/
+$ mysql -u root -p < scripts/mysql.sql
+$ mysql -u root -p
+> create user 'gogs'@'localhost' identified by '密码';
+> grant all privileges on gogs.* to 'gogs'@'localhost';
+> flush privileges;
+> exit;
+
+$ ./gogs web
+$ vim custom/conf/app.ini
+> RUN_USER 默认是 git，指定 Gogs 以哪个用户运行
+> ROOT 所有仓库的存储根路径
+> PROTOCOL 如果你使用 nginx 反代的话请使用 http，如果直接裸跑对外服务的话随意
+> DOMAIN 域名。会影响 SSH clone 地址
+> ROOT_URL 完整的根路径，会影响访问时页面上链接的指向，以及 HTTP clone 的地址
+> HTTP_ADDR 监听地址，使用 nginx 的话建议 127.0.0.1，否则 0.0.0.0 也可以
+> HTTP_PORT 监听端口，默认 3000
+> INSTALL_LOCK 锁定安装页面
+> Mailer 相关的选项
+
+# vim /etc/nginx/conf.d/gogs.conf
+
+# service nginx reload
+
+# # 把 gogs 添加成一个服务
+# cp /home/git/gogs/scripts/xxx /etc/init.d/gogs
+# chmod +x /etc/init.d/gogs

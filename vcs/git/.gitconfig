@@ -1,0 +1,14 @@
+[filter "lfs"]
+    clean = git - lfs clean % f
+    smudge = git - lfs smudge % f
+    required = true
+[user]
+    email = 505932384@qq.com
+    name = jani
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    br = branch
+[credential]
+    helper = osxkeychain[gui]

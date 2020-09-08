@@ -1,0 +1,71 @@
+yum install -y subversion
+
+# 开放端口
+firewall-cmd --zone=public --add-port=80/tcp --permanent
+# 命令含义：
+# --zone #作用域
+# --add-port=80/tcp  #添加端口，格式为：端口/通讯协议
+# --permanent   #永久生效，没有此参数重启后失效
+firewall-cmd --reload # 重启防火墙
+
+
+# 创建版本库文件夹
+mkdir /var/svn/project_name
+
+svnadmin create /var/svn/project_name
+
+cd /var/svn/project_name/conf
+
+vi svnserve.conf
+
+anon-access=none
+auth-access=write
+password-db=passwd
+realm=project_name
+    
+vi passwd
+[user]
+# <登录SVN用户> = <密码>
+# 可多个
+
+vi authz
+[groups]
+admin = admin
+
+[project_name:/]
+@admin =rw
+
+svnserve -d -r /var/svn/project_name
+
+# 生成的链接为 svn://<IP>/
+
+# 可以链接查看是否成功
+
+
+### 建立同步脚本 ###
+cd /var/svn/project_name/hooks/
+
+# 复制同步脚本模板 
+cp post-commit.tmpl post-commit
+
+vi post-commit
+
+# 在该文件尾部追加
+
+export LC_ALL="zh_CN.UTF-8"
+export LANG="en_US.UTF-8"
+
+# 项目文件夹定义
+WEB=/var/www/html/testing
+
+# 注: 如果svn环境变量中没有svn 就得把命令全路径写出来
+# SVN=/url/bin/svn
+# $SVN up $WEB --username <username> --password <password>
+svn up $WEB --username <username> --password <password>
+
+CURDATE = `date`  
+# 把更新记录写入日志中去, 这个很有必要
+echo "Code to by at $CURDATE $REPOS $REV" >> /root/code-hooks.log
+
+chmod 777 /var/svn/project_name/hooks/post-commit
+chmod 755 /root/code-hooks.log

@@ -1,0 +1,33 @@
+## Logstash 安装
+
+# rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+# vi /etc/yum.repos.d/logstash.repo
+[logstash-7.x]
+name=Elastic repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+# yum install logstash
+
+# #启用慢处理
+# yum install haveged
+# systemctl start haveged
+
+# #安装服务
+# cd /usr/share/logstash/bin
+# ./system-install /etc/logstash/startup.options systemd
+# vi /etc/logstash/logstash.yml
+node.name: test
+
+mkdir 755 /var/log/logstash
+chown logstash:logstash /var/log/logstash
+
+chown logstash:logstash /etc/logstash/startup.options
+
+# #启用
+# systemctl start logstash

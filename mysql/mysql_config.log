@@ -1,0 +1,33 @@
+## 设置远程账户
+grant all privileges on *.* to "username"@"%" identified by "密码";
+# grant 权限 privileges on 数据库.表 to 创建的用户名@"%" identified by "密码";
+# * 为正则表示所有
+# % 为不限制访问ip。如果设置了，只能限制指定的 ip 才可以用
+flush privileges;
+
+## 设置密码
+> DESC mysql.user;
+> SELECT User,Host,Password FROM mysql.user;
+> SET PASSWORD FOR 'User'@'Host' = PASSWORD('Password');
+
+## 忘记密码
+mysqladmin -u root password 'new password'
+
+## 默认字符集设置
+详情请查看 my.cnf.d/ 目录，使用 yum 安装后这几个文件里是没有一个配置的。
+
+## 导入导出 sql 文件
+# 导出库
+mysqldump -u 用户名 -p 数据库名 > 导出的文件名
+
+# 导出表
+mysqldump -u 用户名 -p 数据库名 表名> 导出的文件名
+
+# 导出表结构
+mysqldump -u 用户名 -p -d --add-drop-table 数据库名 >导出的文件名
+# -d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table
+
+# 导入 sql
+> source 导入文件路径
+
+# PS: 如果你有远程客户端，为了简单可以直接使用客户端使用 ssh 连接，然后进行操作

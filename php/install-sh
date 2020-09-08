@@ -1,0 +1,37 @@
+./configure \
+"--prefix=/usr/local/php" \
+"--with-config-file-path=/usr/local/php/etc" \
+"--with-mysqli=mysqlnd" \
+"--with-libxml-dir" \
+"--with-pcre-dir" \
+"--with-mcrypt=/usr/local/lib/libmcrypt" \
+"--with-gd" \
+"--with-jpeg-dir" \
+"--with-png-dir" \
+"--with-xpm-dir" \
+"--with-gettext" \
+"--with-freetype-dir" \
+"--with-bz2" \
+"--with-openssl" \
+"--with-pdo-mysql" \
+"--with-iconv-dir" \
+"--with-zlib" \
+"--with-zlib-dir" \
+"--with-curl" \
+"--enable-fpm" \
+"--with-fpm-user=www" \
+"--with-fpm-group=www" \
+"--with-icu-dir=/usr" \
+"--enable-intl" \
+"--enable-sockets" \
+"--enable-gd-native-ttf" \
+"--enable-gd-jis-conv" \
+"--enable-ftp" \
+"--enable-zip" \
+"--enable-calendar" \
+"--enable-mbstring" \
+"--enable-exif" \
+"--enable-fd-setsize=4096" \
+"--disable-short-tags" \
+"--disable-ipv6"
+
