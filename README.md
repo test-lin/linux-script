@@ -17,3 +17,7 @@ linux 下需要用到的软件的安装与配置方法。里面会包含编译�
 * vcs
     * git
     * svn
+
+## 操作脚本
+
+* git 批量管理（vcs/git/git.php）
