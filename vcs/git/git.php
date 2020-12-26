@@ -160,6 +160,12 @@ class Manage
     {
         $this->config_path = $config_path;
     }
+    private function verifyExtis($config_path)
+    {
+        if (! file_exists($config_path)) {
+            $this->echolt("配置文件不存在", true);
+        }
+    }
 
     /**
      * 根据配置文件还原项目
@@ -185,6 +191,7 @@ class Manage
             if (empty($path)) {
                 $path = $this->config_path;
             }
+            $this->verifyExtis($path);
 
             $config = file_get_contents($path);
             $this->config = json_decode($config, true);
@@ -196,13 +203,19 @@ class Manage
     /**
      * 生成配置文件
      */
-    public function explode($project_dir, $save_path)
+    public function export($project_dir, $save_path)
     {
         $root_dir = realpath($project_dir);
 
+        $this->echolt("获取 [{$root_dir}] 目录所有项目");
         $this->getDirProject($root_dir, $projects);
         foreach ($projects as $k => $project) {
+            $this->echolt("取项目 [ {$root_dir} ] 信息开始");
+
             $projects[$k] = $this->getProjectInfo($project, $root_dir);
+            $this->echolt($projects[$k]);
+
+            $this->echolt("取项目 [ {$root_dir} ] 信息结束");
         }
 
         $config = [
@@ -339,8 +352,116 @@ class Manage
     }
 }
 
+class cmd
+{
+    private $argv;
+    
+    public function __construct($argv)
+    {
+        $this->argv = $argv;
 
-$manage = new Manage('./config/xjw.json');
+        if (empty($this->argv)) {
+            $this->help();
+        }
+    }
 
-$data = $manage->pull();
-var_dump($data);
+    public function run()
+    {
+        $param = $this->argv;
+        switch ($param[1]) {
+            case 'import':
+                $this->import($param[2] ?? '', $param[3] ?? '');
+                break;
+            case 'export':
+                $this->export($param[2] ?? '', $param[3] ?? '');
+                break;
+            case 'pull':
+                $this->pull($param[2] ?? '');
+                break;
+            case 'push':
+                $this->push($param[2] ?? '');
+                break;
+            case 'help':
+            default:
+                $this->help();
+                break;
+        }
+    }
+
+    protected function help()
+    {
+        $content = <<<STR
+usage: php git.php <command> [<args>]
+
+最常用的 git.php 命令有：
+   import <configFilePath> <importDir>   通过配置文件还原项目
+   export <exportDir> <configFilePath>   为指定目录中所有项目生成配置文件
+   pull [<configFilePath>]               拉取配置文件中记录的项目（包含全部分支）
+   push [<configFilePath>]               推送配置文件中记录的项目（包含全部分支）
+
+命令 'php git.php help' 来查看给定的子命令帮助或指南。
+STR;
+        $this->echolt($content, true);
+    }
+
+    protected function import($configFilePath, $importDir)
+    {
+        if (empty($configFilePath)) {
+            $this->echolt("请传入配置文件路径", true);
+        }
+        if (empty($importDir)) {
+            $this->echolt("没有传入拉取目录，将保存到当前目录");
+            $importDir = './';
+        }
+
+        $manage = new Manage($saveConfigFilePath);
+        $manage->import($configFilePath, $saveConfigFilePath);
+    }
+
+    protected function export($exportDir, $saveConfigFilePath)
+    {
+        if (empty($exportDir)) {
+            $this->echolt("请转入生成配置目录", true);
+        }
+        if (empty($saveConfigFilePath)) {
+            $this->echolt("没有传入配置文件保存地址，将保存至 ./project.json");
+            $saveConfigFilePath = './project.json';
+        }
+        
+        $manage = new Manage($saveConfigFilePath);
+        $manage->export($exportDir, $saveConfigFilePath);
+    }
+
+    protected function pull($configFilePath)
+    {
+        if (empty($configFilePath) && !(file_exists("./project.json"))) {
+            $this->echolt("./project.json 文件不存在，请生成或传入配置文件路径", true);
+        }
+
+        $manage = new Manage($configFilePath);
+        $manage->pull();
+    }
+
+    protected function push($configFilePath)
+    {
+        if (empty($configFilePath) && !(file_exists("./project.json"))) {
+            $this->echolt("./project.json 文件不存在，请生成或传入配置文件路径", true);
+        }
+
+        $manage = new Manage($configFilePath);
+        $manage->push();
+    }
+
+    protected function echolt($str, $exit=0)
+    {
+        if (! is_string($str)) {
+            $str = json_encode($str, JSON_UNESCAPED_UNICODE);
+        }
+
+        echo $str."\n";
+
+        if ($exit) exit;
+    }
+}
+
+(new cmd($argv))->run();
